@@ -54,4 +54,4 @@ A precision web-based measurement tool designed with a minimalist, high-performa
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the PolyForm Noncommercial License 1.0.0 - see the [LICENSE](LICENSE) file for details. This license prohibits the use of the software for commercial purposes.

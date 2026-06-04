@@ -1,21 +1,63 @@
-MIT License
+PolyForm Noncommercial License 1.0.0
 
-Copyright (c) 2026 GagDrag
+<https://polyformproject.org/licenses/noncommercial/1.0.0>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## Acceptance
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+By using the software, you agree to these terms and the terms of any
+other license for the software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING WITHOUT LIMITATION THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## Copyright License
+
+The licensor grants you a non-exclusive, royalty-free,
+worldwide, non-sublicensable license to use, reproduce, prepare
+derivative works of, and distribute the software for
+noncommercial purposes.
+
+## Patent License
+
+The licensor grants you a non-exclusive, royalty-free,
+worldwide, non-sublicensable license under its patents to make,
+use, sell, offer for sale, import, and otherwise run the
+software for noncommercial purposes.
+
+## Noncommercial Purposes
+
+Noncommercial purposes are any purposes that are not primarily intended
+for or directed toward commercial advantage or monetary compensation.
+Specifically:
+
+1.  Use by an individual for personal, private, and non-monetized purposes
+    is noncommercial.
+
+2.  Use by an organization is noncommercial if the organization is not
+    oriented toward profit.
+
+3.  Use to provide services to others for a fee is not noncommercial.
+
+4.  Use to create a product that is sold for a fee is not noncommercial.
+
+## Notices
+
+You must include a copy of this license in all copies of the software
+that you distribute.
+
+## Refusal
+
+The licensor may terminate this license at any time if you violate any
+of its terms.
+
+## No Other Rights
+
+This license does not grant any other rights, including any right to use
+any trademark, service mark, or logo.
+
+## Disclaimer
+
+AS-IS. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
