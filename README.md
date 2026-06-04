@@ -1,56 +1,64 @@
-# Real Online Ruler
+# Real Online Ruler - Precision On-Screen Measurement Tool
 
-Hey! This is a simple, precision measurement tool for your web browser. I built it with a clean, Vercel-inspired aesthetic so it looks great while actually being useful. It uses Astro, React, and Tailwind CSS v4 to stay fast and responsive.
+![Real Online Ruler](./realonlineruler.png)
 
-## ✨ Why use this?
+Hey! This is **Real Online Ruler**, a simple and highly accurate precision measurement tool for your web browser. I built this because most online rulers are just images that don't account for different screen sizes. This tool lets you calibrate your display so that 1 inch on your screen is exactly 1 inch in real life.
 
-- **Real-world Accuracy**: You can calibrate your screen using something standard (like a credit card) to make sure 1 inch on your screen is exactly 1 inch in real life.
-- **Clean Design**: No clutter. It’s built to be stark, functional, and easy on the eyes.
-- **Interactive Tools**: Just drag and drop the measurement tools to check dimensions quickly.
-- **High Performance**: It’s built on Astro, so it only loads the JavaScript it absolutely needs.
+It’s designed with a clean, Vercel-inspired aesthetic—making it as beautiful as it is functional. Built using **Astro**, **React**, and **Tailwind CSS v4** for maximum speed and responsiveness.
 
-## 🚀 Built With
+## ✨ Why use this Online Ruler?
 
-- **Framework**: [Astro 6](https://astro.build/)
-- **UI Library**: [React 19](https://react.dev/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Actual 1:1 Accuracy**: Use the "Precision Calibration" feature with a standard object (like a credit card or ID) to ensure your measurements are 100% accurate on any monitor.
+- **Minimalist & Ad-Free**: No clutter, no distractions. Just a stark, functional interface focused on utility.
+- **Interactive Drag-and-Drop**: Easily move measurement tools around your screen to check dimensions of any element or object.
+- **Privacy-Focused & Fast**: Built with Astro's lightweight architecture, so it loads instantly and doesn't track you.
 
-## 🛠️ Get it running locally
+## 🚀 Modern Tech Stack
+
+- **Framework**: [Astro 6](https://astro.build/) (Zero-JS by default)
+- **UI Library**: [React 19](https://react.dev/) (For interactive tools)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) (Next-gen styling)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/) (Smooth interactions)
+
+## 🛠️ How to run it locally
+
+If you want to play with the code or run it on your own machine, here’s how to get started.
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v22.12.0 or higher)
-- [npm](https://www.npmjs.com/)
+- **Node.js**: v22.12.0 or higher
+- **npm**: (comes with Node.js)
 
-### Installation
+### Installation Steps
 
-1. **Clone the repo:**
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/GagDrag/realonlineruler.com.git
    cd realonlineruler.com
    ```
 
-2. **Install what you need:**
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Fire up the dev server:**
+3. **Start the development server:**
    ```bash
    npm run dev
    ```
-   Now just open `http://localhost:4321` in your browser.
+   Open `http://localhost:4321` in your browser to see it in action!
 
-## 🧞 Useful Commands
+## 🧞 Common Commands
 
-| Command | What it does |
+| Command | Description |
 | :--- | :--- |
-| `npm install` | Installs everything |
-| `npm run dev` | Starts the dev server |
-| `npm run build` | Builds the site for production |
-| `npm run preview` | Lets you preview your build |
+| `npm install` | Setup the project dependencies |
+| `npm run dev` | Start the local development environment |
+| `npm run build` | Create a production-ready build |
+| `npm run preview` | Preview the production build locally |
 
-## 📄 License
+## 📄 Licensing
 
-I've released this under the PolyForm Noncommercial License 1.0.0. You’re free to use it for personal projects, but please don't use it for anything commercial. Check out the [LICENSE](LICENSE) file for the full details.
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**. 
+
+You are free to use, modify, and learn from this for personal projects. However, **commercial use is strictly prohibited**. This includes selling the software, using it for paid services, or creating a commercial product based on it. Please see the [LICENSE](LICENSE) file for the full legal text.
