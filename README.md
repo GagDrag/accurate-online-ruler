@@ -1,57 +1,56 @@
 # Real Online Ruler
 
-A precision web-based measurement tool designed with a minimalist, high-performance aesthetic. Built with Astro, React, and Tailwind CSS v4, this tool provides a calibrated on-screen ruler for quick and accurate measurements.
+Hey! This is a simple, precision measurement tool for your web browser. I built it with a clean, Vercel-inspired aesthetic so it looks great while actually being useful. It uses Astro, React, and Tailwind CSS v4 to stay fast and responsive.
 
-## ✨ Features
+## ✨ Why use this?
 
-- **Precision Calibration**: Calibrate your screen using standard objects (like a credit card) to ensure 1:1 real-world accuracy.
-- **Minimalist Design**: Inspired by Vercel's design language—clean, stark, and focused on utility.
-- **Interactive Measurement**: Drag-and-drop measurement tools for effortless dimension checking.
-- **Responsive & Fast**: Leverages Astro's zero-JS-by-default architecture where possible, with React for interactive components.
+- **Real-world Accuracy**: You can calibrate your screen using something standard (like a credit card) to make sure 1 inch on your screen is exactly 1 inch in real life.
+- **Clean Design**: No clutter. It’s built to be stark, functional, and easy on the eyes.
+- **Interactive Tools**: Just drag and drop the measurement tools to check dimensions quickly.
+- **High Performance**: It’s built on Astro, so it only loads the JavaScript it absolutely needs.
 
-## 🚀 Tech Stack
+## 🚀 Built With
 
 - **Framework**: [Astro 6](https://astro.build/)
 - **UI Library**: [React 19](https://react.dev/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
 
-## 🛠️ Getting Started
+## 🛠️ Get it running locally
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v22.12.0 or higher recommended)
+- [Node.js](https://nodejs.org/) (v22.12.0 or higher)
 - [npm](https://www.npmjs.com/)
 
 ### Installation
 
-1. **Clone the repository:**
+1. **Clone the repo:**
    ```bash
    git clone https://github.com/GagDrag/realonlineruler.com.git
    cd realonlineruler.com
    ```
 
-2. **Install dependencies:**
+2. **Install what you need:**
    ```bash
    npm install
    ```
 
-3. **Start the development server:**
+3. **Fire up the dev server:**
    ```bash
    npm run dev
    ```
-   Your app will be running at `http://localhost:4321`.
+   Now just open `http://localhost:4321` in your browser.
 
-## 🧞 Commands
+## 🧞 Useful Commands
 
-| Command | Action |
+| Command | What it does |
 | :--- | :--- |
-| `npm install` | Installs dependencies |
-| `npm run dev` | Starts local dev server at `localhost:4321` |
-| `npm run build` | Build your production site to `./dist/` |
-| `npm run preview` | Preview your build locally, before deploying |
-| `npm run astro ...` | Run CLI commands like `astro add`, `astro check` |
+| `npm install` | Installs everything |
+| `npm run dev` | Starts the dev server |
+| `npm run build` | Builds the site for production |
+| `npm run preview` | Lets you preview your build |
 
 ## 📄 License
 
-This project is licensed under the PolyForm Noncommercial License 1.0.0 - see the [LICENSE](LICENSE) file for details. This license prohibits the use of the software for commercial purposes.
+I've released this under the PolyForm Noncommercial License 1.0.0. You’re free to use it for personal projects, but please don't use it for anything commercial. Check out the [LICENSE](LICENSE) file for the full details.
