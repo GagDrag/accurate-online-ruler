@@ -33,8 +33,8 @@ If you want to play with the code or run it on your own machine, here’s how to
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/GagDrag/realonlineruler.com.git
-   cd realonlineruler.com
+   git clone https://github.com/GagDrag/accurate-online-ruler.git
+   cd accurate-online-ruler
    ```
 
 2. **Install dependencies:**

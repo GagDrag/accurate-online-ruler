@@ -25,3 +25,7 @@ pnpm-debug.log*
 
 # fallow cache
 .fallow/
+.fallowrc.json
+
+# Reports
+REFACTOR.md
