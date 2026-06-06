@@ -1,21 +1,128 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { Unit } from "./RulerApp";
 
+interface Point {
+  x: number;
+  y: number;
+}
+
 interface MeasurementToolProps {
   ppi: number;
   unit: Unit;
   topOffset?: number;
 }
 
-interface Point {
-  x: number;
-  y: number;
-}
+// --- Utils ---
 
 function formatDistance(pixels: number, unit: Unit, ppi: number): string {
   if (unit === "px") return `${Math.round(pixels)} px`;
   if (unit === "cm") return `${((pixels * 2.54) / ppi).toFixed(1)} cm`;
   return `${(pixels / ppi).toFixed(2)}"`;
+}
+
+function calculateDistance(p1: Point, p2: Point): number {
+  return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
+}
+
+// --- Sub-components ---
+
+function Crosshair({ x, y }: Point) {
+  return (
+    <>
+      <div
+        className="absolute w-px h-full bg-link/30 pointer-events-none"
+        style={{ left: x }}
+      />
+      <div
+        className="absolute h-px w-full bg-link/30 pointer-events-none"
+        style={{ top: y }}
+      />
+    </>
+  );
+}
+
+function MeasurementLine({ 
+  start, 
+  end, 
+  isDragging 
+}: { 
+  start: Point, 
+  end: Point, 
+  isDragging: boolean 
+}) {
+  return (
+    <>
+      <div
+        className="absolute w-3 h-3 -ml-1.5 -mt-1.5 rounded-full bg-link border-2 border-canvas dark:border-ink shadow-sm pointer-events-none"
+        style={{ left: start.x, top: start.y }}
+      />
+      <div
+        className="absolute w-3 h-3 -ml-1.5 -mt-1.5 rounded-full bg-link border-2 border-canvas dark:border-ink shadow-sm pointer-events-none"
+        style={{ left: end.x, top: end.y }}
+      />
+      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+        <line
+          x1={start.x}
+          y1={start.y}
+          x2={end.x}
+          y2={end.y}
+          stroke="#0070f3"
+          strokeWidth="1.5"
+          strokeDasharray={isDragging ? "4 2" : "none"}
+        />
+        {/* Horizontal & vertical projections (only when not dragging to keep it clean) */}
+        {!isDragging && (
+          <>
+            <line
+              x1={start.x}
+              y1={start.y}
+              x2={end.x}
+              y2={start.y}
+              stroke="currentColor"
+              className="text-mute/50"
+              strokeWidth="0.5"
+              strokeDasharray="3 3"
+            />
+            <line
+              x1={end.x}
+              y1={start.y}
+              x2={end.x}
+              y2={end.y}
+              stroke="currentColor"
+              className="text-mute/50"
+              strokeWidth="0.5"
+              strokeDasharray="3 3"
+            />
+          </>
+        )}
+      </svg>
+    </>
+  );
+}
+
+function Instructions({ startPoint, endPoint, topOffset }: { 
+  startPoint: Point | null, 
+  endPoint: Point | null, 
+  topOffset: number 
+}) {
+  let text = "Click or drag to measure distance · Press Esc to exit";
+  if (startPoint && !endPoint) text = "Click to set end point, or drag to start over";
+  if (startPoint && endPoint) text = "Click or drag to measure again · Press Esc to exit";
+
+  return (
+    <div 
+      className="absolute left-1/2 -translate-x-1/2 bg-ink/90 dark:bg-white text-canvas dark:text-ink text-xs font-mono px-3 py-1.5 rounded-full pointer-events-none backdrop-blur-sm shadow-xl transition-all"
+      style={{ top: topOffset + 16 }}
+    >
+      {text.includes("Esc") ? (
+        <>
+          {text.split("Esc")[0]}
+          <kbd className="px-1 bg-white/10 dark:bg-black/10 rounded text-[10px]">Esc</kbd>
+          {text.split("Esc")[1]}
+        </>
+      ) : text}
+    </div>
+  );
 }
 
 export default function MeasurementTool({ ppi, unit, topOffset = 0 }: MeasurementToolProps) {
@@ -27,53 +134,68 @@ export default function MeasurementTool({ ppi, unit, topOffset = 0 }: Measuremen
   const mouseDownPos = useRef<Point | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = useCallback((e: MouseEvent) => {
-    const rect = (e.target as HTMLElement).closest(".measure-overlay")?.getBoundingClientRect();
-    if (!rect) return;
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  const getRelativePoint = useCallback((e: MouseEvent | TouchEvent): Point | null => {
+    const el = overlayRef.current;
+    if (!el) return null;
     
-    mouseDownPos.current = { x, y };
+    const rect = el.getBoundingClientRect();
+    let clientX, clientY;
+    
+    if ("touches" in e) {
+      if (e.touches.length === 0) return null;
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top
+    };
+  }, []);
+
+  const handleMouseDown = useCallback((e: MouseEvent) => {
+    const point = getRelativePoint(e);
+    if (!point) return;
+    
+    mouseDownPos.current = point;
 
     if (isPlacingEnd) {
-      setEndPoint({ x, y });
+      setEndPoint(point);
       setIsPlacingEnd(false);
     } else {
-      setStartPoint({ x, y });
+      setStartPoint(point);
       setEndPoint(null);
       setIsDragging(true);
     }
-  }, [isPlacingEnd]);
+  }, [isPlacingEnd, getRelativePoint]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    const rect = (e.target as HTMLElement).closest(".measure-overlay")?.getBoundingClientRect();
-    if (!rect) return;
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setCurrentMouse({ x, y });
+    const point = getRelativePoint(e);
+    if (!point) return;
+    
+    setCurrentMouse(point);
     
     if (isDragging || isPlacingEnd) {
-      setEndPoint({ x, y });
+      setEndPoint(point);
     }
-  }, [isDragging, isPlacingEnd]);
+  }, [isDragging, isPlacingEnd, getRelativePoint]);
 
   const handleMouseUp = useCallback((e: MouseEvent) => {
     if (!mouseDownPos.current || !isDragging) return;
     
-    const rect = (e.target as HTMLElement).closest(".measure-overlay")?.getBoundingClientRect();
-    if (!rect) return;
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const point = getRelativePoint(e);
+    if (!point) return;
 
-    const dist = Math.sqrt((x - mouseDownPos.current.x) ** 2 + (y - mouseDownPos.current.y) ** 2);
-    
+    const dist = calculateDistance(mouseDownPos.current, point);
     setIsDragging(false);
     
-    // If it was a tiny movement, assume it's the first click of a two-click sequence
     if (dist < 5) {
       setIsPlacingEnd(true);
     }
-  }, [isDragging]);
+  }, [isDragging, getRelativePoint]);
 
   useEffect(() => {
     const el = overlayRef.current;
@@ -92,24 +214,24 @@ export default function MeasurementTool({ ppi, unit, topOffset = 0 }: Measuremen
   useEffect(() => {
     const el = overlayRef.current;
     if (!el) return;
+
     const handleTouchStart = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      const rect = el.getBoundingClientRect();
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
-      setStartPoint({ x, y });
+      const point = getRelativePoint(e);
+      if (!point) return;
+      setStartPoint(point);
       setEndPoint(null);
       setIsDragging(true);
     };
+
     const handleTouchMove = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      const rect = el.getBoundingClientRect();
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
-      setCurrentMouse({ x, y });
-      if (isDragging) setEndPoint({ x, y });
+      const point = getRelativePoint(e);
+      if (!point) return;
+      setCurrentMouse(point);
+      if (isDragging) setEndPoint(point);
     };
+
     const handleTouchEnd = () => setIsDragging(false);
+
     el.addEventListener("touchstart", handleTouchStart, { passive: true });
     el.addEventListener("touchmove", handleTouchMove, { passive: true });
     el.addEventListener("touchend", handleTouchEnd);
@@ -118,92 +240,24 @@ export default function MeasurementTool({ ppi, unit, topOffset = 0 }: Measuremen
       el.removeEventListener("touchmove", handleTouchMove);
       el.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [isDragging]);
+  }, [isDragging, getRelativePoint]);
 
   const activePoint = isDragging ? currentMouse : endPoint || currentMouse;
-  const distance =
-    startPoint && endPoint
-      ? Math.sqrt((endPoint.x - startPoint.x) ** 2 + (endPoint.y - startPoint.y) ** 2)
-      : startPoint && isDragging
-        ? Math.sqrt((currentMouse.x - startPoint.x) ** 2 + (currentMouse.y - startPoint.y) ** 2)
-        : null;
-
-  const dx = startPoint && (endPoint || (isDragging ? currentMouse : null))
-    ? Math.abs((endPoint || currentMouse).x - startPoint.x)
-    : null;
-  const dy = startPoint && (endPoint || (isDragging ? currentMouse : null))
-    ? Math.abs((endPoint || currentMouse).y - startPoint.y)
-    : null;
+  const distance = startPoint ? calculateDistance(startPoint, activePoint) : null;
+  const dx = startPoint ? Math.abs(activePoint.x - startPoint.x) : null;
+  const dy = startPoint ? Math.abs(activePoint.y - startPoint.y) : null;
 
   return (
     <div
       ref={overlayRef}
       className="measure-overlay absolute inset-0 z-45 cursor-crosshair"
     >
-      {/* Crosshair at current mouse position */}
-      {!startPoint && (
-        <>
-          <div
-            className="absolute w-px h-full bg-link/30 pointer-events-none"
-            style={{ left: currentMouse.x }}
-          />
-          <div
-            className="absolute h-px w-full bg-link/30 pointer-events-none"
-            style={{ top: currentMouse.y }}
-          />
-        </>
-      )}
+      {!startPoint && <Crosshair {...currentMouse} />}
 
-      {/* Measurement line */}
       {startPoint && (
         <>
-          {/* Start point */}
-          <div
-            className="absolute w-3 h-3 -ml-1.5 -mt-1.5 rounded-full bg-link border-2 border-canvas dark:border-ink shadow-sm pointer-events-none"
-            style={{ left: startPoint.x, top: startPoint.y }}
-          />
-          {/* End/current point */}
-          <div
-            className="absolute w-3 h-3 -ml-1.5 -mt-1.5 rounded-full bg-link border-2 border-canvas dark:border-ink shadow-sm pointer-events-none"
-            style={{ left: activePoint.x, top: activePoint.y }}
-          />
-          {/* Line */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none">
-            <line
-              x1={startPoint.x}
-              y1={startPoint.y}
-              x2={activePoint.x}
-              y2={activePoint.y}
-              stroke="#0070f3"
-              strokeWidth="1.5"
-              strokeDasharray={isDragging ? "4 2" : "none"}
-            />
-            {/* Horizontal & vertical projections */}
-            {endPoint && (
-              <>
-                <line
-                  x1={startPoint.x}
-                  y1={startPoint.y}
-                  x2={endPoint.x}
-                  y2={startPoint.y}
-                  stroke="currentColor"
-                  className="text-mute/50"
-                  strokeWidth="0.5"
-                  strokeDasharray="3 3"
-                />
-                <line
-                  x1={endPoint.x}
-                  y1={startPoint.y}
-                  x2={endPoint.x}
-                  y2={endPoint.y}
-                  stroke="currentColor"
-                  className="text-mute/50"
-                  strokeWidth="0.5"
-                  strokeDasharray="3 3"
-                />
-              </>
-            )}
-          </svg>
+          <MeasurementLine start={startPoint} end={activePoint} isDragging={isDragging} />
+          
           {/* Distance label */}
           <div
             className="absolute bg-ink dark:bg-white text-canvas dark:text-ink text-xs font-mono px-2 py-1 rounded-md shadow-lg pointer-events-none whitespace-nowrap"
@@ -223,31 +277,7 @@ export default function MeasurementTool({ ppi, unit, topOffset = 0 }: Measuremen
         </>
       )}
 
-      {/* Instructions */}
-      {!startPoint && (
-        <div 
-          className="absolute left-1/2 -translate-x-1/2 bg-ink/90 dark:bg-white text-canvas dark:text-ink text-xs font-mono px-3 py-1.5 rounded-full pointer-events-none backdrop-blur-sm shadow-xl transition-all"
-          style={{ top: topOffset + 16 }}
-        >
-          Click or drag to measure distance · Press <kbd className="px-1 bg-white/10 dark:bg-black/10 rounded text-[10px]">Esc</kbd> to exit
-        </div>
-      )}
-      {startPoint && !endPoint && (
-        <div 
-          className="absolute left-1/2 -translate-x-1/2 bg-ink/90 dark:bg-white text-canvas dark:text-ink text-xs font-mono px-3 py-1.5 rounded-full pointer-events-none backdrop-blur-sm shadow-xl transition-all"
-          style={{ top: topOffset + 16 }}
-        >
-          Click to set end point, or drag to start over
-        </div>
-      )}
-      {startPoint && endPoint && (
-        <div 
-          className="absolute left-1/2 -translate-x-1/2 bg-ink/90 dark:bg-white text-canvas dark:text-ink text-xs font-mono px-3 py-1.5 rounded-full pointer-events-none backdrop-blur-sm shadow-xl transition-all"
-          style={{ top: topOffset + 16 }}
-        >
-          Click or drag to measure again · Press <kbd className="px-1 bg-white/10 dark:bg-black/10 rounded text-[10px]">Esc</kbd> to exit
-        </div>
-      )}
+      <Instructions startPoint={startPoint} endPoint={endPoint} topOffset={topOffset} />
     </div>
   );
 }

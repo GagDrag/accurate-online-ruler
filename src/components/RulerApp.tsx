@@ -1,11 +1,14 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Ruler from "./Ruler";
 import CalibrationPanel from "./CalibrationPanel";
 import MeasurementTool from "./MeasurementTool";
+import { useTheme } from "../hooks/useTheme";
+import { useScreenDimensions } from "../hooks/useScreenDimensions";
+import { useFullscreen } from "../hooks/useFullscreen";
 
 export type Unit = "cm" | "inch" | "px";
-export type RulerSide = "top" | "bottom" | "left" | "right";
+type RulerSide = "top" | "bottom" | "left" | "right";
 export type CalibrationMethod = "auto" | "diagonal" | "creditcard" | "none";
 
 interface CalibrationState {
@@ -19,15 +22,15 @@ const DEFAULT_PPI = 96;
 const RULER_SIZE = 40;
 
 function getScreenDimension(unit: Unit, pixels: number, ppi: number): string {
-  if (unit === "px") return `${pixels}px`;
-  if (unit === "cm") return `${((pixels * 25.4) / ppi).toFixed(1)} cm`;
-  return `${(pixels / ppi).toFixed(2)}"`;
+  if (unit === "px") return `${Math.round(pixels)}px`;
+  if (unit === "cm") return `${((pixels * 25.4) / ppi / 10).toFixed(1)}cm`;
+  return `${(pixels / ppi).toFixed(1)}"`;
 }
 
 export default function RulerApp() {
   const [unit, setUnit] = useState<Unit>("cm");
   const [rulerSides, setRulerSides] = useState<RulerSide[]>(["top", "left"]);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const { isFullscreen, toggleFullscreen } = useFullscreen();
   const [calibration, setCalibration] = useState<CalibrationState>({
     method: "none",
     ppi: DEFAULT_PPI,
@@ -37,34 +40,8 @@ export default function RulerApp() {
   const [showCalibration, setShowCalibration] = useState(false);
   const [isMeasuring, setIsMeasuring] = useState(false);
   const [zoomWarning, setZoomWarning] = useState(false);
-  const [screenWidth, setScreenWidth] = useState(0);
-  const [screenHeight, setScreenHeight] = useState(0);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-
-  // Initialize theme
-  useEffect(() => {
-    if (document.documentElement.classList.contains("dark")) {
-      setTheme("dark");
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const nextTheme = theme === "light" ? "dark" : "light";
-    setTheme(nextTheme);
-    if (nextTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
-
-  // Initialize dimensions on mount
-  useEffect(() => {
-    setScreenWidth(window.innerWidth);
-    setScreenHeight(window.innerHeight);
-  }, []);
+  const { width: screenWidth, height: screenHeight } = useScreenDimensions();
+  const { theme, toggleTheme } = useTheme();
 
   // Detect browser zoom
   useEffect(() => {
@@ -75,16 +52,6 @@ export default function RulerApp() {
     checkZoom();
     window.addEventListener("resize", checkZoom);
     return () => window.removeEventListener("resize", checkZoom);
-  }, []);
-
-  // Track screen dimensions
-  useEffect(() => {
-    const update = () => {
-      setScreenWidth(window.innerWidth);
-      setScreenHeight(window.innerHeight);
-    };
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
   }, []);
 
   // Load calibration from localStorage
@@ -116,23 +83,6 @@ export default function RulerApp() {
       localStorage.setItem("ruler-calibration", JSON.stringify(calibration));
     }
   }, [calibration]);
-
-  // Fullscreen toggle
-  const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const handler = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", handler);
-    return () => document.removeEventListener("fullscreenchange", handler);
-  }, []);
 
   // Toggle ruler side
   const toggleSide = useCallback((side: RulerSide) => {
@@ -177,7 +127,7 @@ export default function RulerApp() {
   const hasRightRuler = rulerSides.includes("right");
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-canvas dark:bg-ink transition-colors duration-300">
+    <div className="relative w-full h-full overflow-hidden bg-canvas dark:bg-ink transition-colors duration-300">
       {/* Mesh gradient (Vercel style) - only shown when not measuring */}
       {!isMeasuring && (
         <div className="absolute top-0 left-0 right-0 h-[60vh] overflow-hidden pointer-events-none opacity-40 dark:opacity-20 transition-opacity duration-1000">
@@ -287,17 +237,20 @@ export default function RulerApp() {
                       <button
                         key={side}
                         onClick={() => toggleSide(side)}
-                        className={`w-9 h-9 flex items-center justify-center rounded-full border transition-all ${
+                        className={`group flex flex-col items-center justify-center gap-1.5 px-3 py-2 rounded-xl border transition-all ${
                           rulerSides.includes(side)
                             ? "bg-ink dark:bg-white text-canvas dark:text-ink border-ink dark:border-white shadow-md"
                             : "bg-canvas/50 dark:bg-transparent text-body dark:text-mute border-hairline dark:border-white/10 hover:border-hairline-strong dark:hover:border-white/20"
                         }`}
                         title={`Toggle ${side} ruler`}
                       >
-                        {side === "top" && <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4 5V7M8 5V9M12 5V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
-                        {side === "bottom" && <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="rotate-180"><rect x="2" y="2" width="12" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4 5V7M8 5V9M12 5V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
-                        {side === "left" && <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="-rotate-90"><rect x="2" y="2" width="12" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4 5V7M8 5V9M12 5V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
-                        {side === "right" && <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="rotate-90"><rect x="2" y="2" width="12" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4 5V7M8 5V9M12 5V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
+                        <div className="w-5 h-5 flex items-center justify-center">
+                          {side === "top" && <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4 5V7M8 5V9M12 5V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
+                          {side === "bottom" && <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="rotate-180"><rect x="2" y="2" width="12" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4 5V7M8 5V9M12 5V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
+                          {side === "left" && <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="-rotate-90"><rect x="2" y="2" width="12" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4 5V7M8 5V9M12 5V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
+                          {side === "right" && <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="rotate-90"><rect x="2" y="2" width="12" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.5"/><path d="M4 5V7M8 5V9M12 5V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>}
+                        </div>
+                        <span className="text-[9px] font-mono font-bold uppercase tracking-tighter leading-none">{side}</span>
                       </button>
                     ))}
                   </div>
@@ -435,7 +388,7 @@ export default function RulerApp() {
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
         className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none"
       >
-        <div className="h-12 flex items-center justify-center px-5">
+        <div className="h-12 flex items-center justify-center px-5 gap-2">
           <div className="bg-canvas/60 dark:bg-ink/60 backdrop-blur-md border border-hairline dark:border-white/10 px-4 py-1.5 rounded-full text-[11px] font-mono text-mute flex items-center gap-4 shadow-sm select-none">
             <span className="text-body dark:text-mute">
               {getScreenDimension(unit, screenWidth, calibration.ppi)} × {getScreenDimension(unit, screenHeight, calibration.ppi)}
@@ -445,6 +398,20 @@ export default function RulerApp() {
               {calibration.ppi.toFixed(0)} PPI
             </span>
           </div>
+          
+          <button
+            onClick={() => {
+              document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="pointer-events-auto group bg-canvas/60 dark:bg-ink/60 backdrop-blur-md border border-hairline dark:border-white/10 px-4 py-1.5 rounded-full text-[11px] font-mono text-mute hover:text-ink dark:hover:text-white hover:border-hairline-strong dark:hover:border-white/30 transition-all shadow-sm flex items-center gap-2"
+          >
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M8 11V8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M8 5V5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            About
+          </button>
         </div>
       </motion.div>
 
