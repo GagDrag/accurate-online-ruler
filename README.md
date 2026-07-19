@@ -1,8 +1,8 @@
-# Real Online Ruler - Precision On-Screen Measurement Tool
+# Accurate Online Ruler - Precision On-Screen Measurement Tool
 
-![Real Online Ruler](./realonlineruler.png)
+![Accurate Online Ruler](./accurate-online-ruler.png)
 
-Hey! This is **Real Online Ruler**, a simple and highly accurate precision measurement tool for your web browser. I built this because most online rulers are just images that don't account for different screen sizes. This tool lets you calibrate your display so that 1 inch on your screen is exactly 1 inch in real life.
+Hey! This is **Accurate Online Ruler**, a simple and highly accurate precision measurement tool for your web browser. I built this because most online rulers are just images that don't account for different screen sizes. This tool lets you calibrate your display so that 1 inch on your screen is exactly 1 inch in real life.
 
 It’s designed with a clean, Vercel-inspired aesthetic—making it as beautiful as it is functional. Built using **Astro**, **React**, and **Tailwind CSS v4** for maximum speed and responsiveness.
 
@@ -59,6 +59,4 @@ If you want to play with the code or run it on your own machine, here’s how to
 
 ## 📄 Licensing
 
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**. 
-
-You are free to use, modify, and learn from this for personal projects. However, **commercial use is strictly prohibited**. This includes selling the software, using it for paid services, or creating a commercial product based on it. Please see the [LICENSE](LICENSE) file for the full legal text.
+This project is licensed under the **MIT License**. Use it, modify it, ship it — commercially or otherwise. See the [LICENSE](LICENSE) file for the full text.
